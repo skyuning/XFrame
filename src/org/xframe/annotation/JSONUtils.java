@@ -24,7 +24,7 @@ public class JSONUtils {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @Inherited
-    public static @interface FieldInject {
+    public static @interface JSONDict{
         public String name();
 
         public String defVal() default "";
@@ -36,7 +36,7 @@ public class JSONUtils {
         Class<?> clazz = javaObject.getClass();
         List<Field> fields = recursiveGetFields(clazz, false);
         for (Field field : fields) {
-            FieldInject ann = field.getAnnotation(FieldInject.class);
+            JSONDict ann = field.getAnnotation(JSONDict.class);
             if (null == ann || TextUtils.isEmpty(ann.name()))
                 continue;
 
@@ -55,7 +55,7 @@ public class JSONUtils {
     }
 
     private static void setJson2Field(Object object, Field field,
-            FieldInject ann, Object value) throws JSONException,
+            JSONDict ann, Object value) throws JSONException,
             InstantiationException, IllegalAccessException {
 
         // check the value
