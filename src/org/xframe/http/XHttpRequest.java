@@ -15,21 +15,21 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
 import android.text.TextUtils;
 
-@AHttpAttr
-abstract public class AHttpRequest implements AHttpResponseHandler {
+@XHttpAttr
+abstract public class XHttpRequest implements XHttpResponseHandler {
 
     public static enum AHttpMethod {
         GET, POST, DELETE
     }
 
     private Map<String, String> mParamMap = new HashMap<String, String>();
-    private AHttpAttr mAttr;
+    private XHttpAttr mAttr;
 
-    public AHttpRequest() {
-        mAttr = this.getClass().getAnnotation(AHttpAttr.class);
+    public XHttpRequest() {
+        mAttr = this.getClass().getAnnotation(XHttpAttr.class);
     }
 
-    public AHttpAttr getAttr() {
+    public XHttpAttr getAttr() {
         return mAttr;
     }
 

@@ -13,14 +13,18 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
-import org.xframe.http.AHttpCallback.AHttpResult;
+import org.xframe.http.XHttpCallback.AHttpResult;
 
-public class AHttpClient {
+public class XHttpClient {
 
-    public static void sendRequest(final AHttpRequest request, final AHttpCallback... callbacks) {
+    public static void sendRequest(final XHttpRequest request, final XHttpCallback... callbacks) {
 
         try {
             sendRequest(request.buildRequest(), request, request.getAttr().charset(), callbacks);
@@ -29,20 +33,20 @@ public class AHttpClient {
             AHttpResult result = new AHttpResult();
             result.isSuccess = false;
             result.e = e;
-            for (AHttpCallback callback : callbacks)
+            for (XHttpCallback callback : callbacks)
                 callback.onFaild(result);
         }
     }
 
     public static void sendRequest(final HttpUriRequest request,
-            final AHttpResponseHandler responseHandler, final String charset,
-            final AHttpCallback... callbacks) {
+            final XHttpResponseHandler responseHandler, final String charset,
+            final XHttpCallback... callbacks) {
 
-        AHttpAsyncTask reqTask = new AHttpAsyncTask() {
+        XHttpAsyncTask reqTask = new XHttpAsyncTask() {
 
             @Override
             protected void onPreExecute() {
-                for (AHttpCallback callback : callbacks)
+                for (XHttpCallback callback : callbacks)
                     callback.onPreExecute();
             }
 
@@ -50,7 +54,11 @@ public class AHttpClient {
             protected AHttpResult doInBackground(Void... params) {
                 AHttpResult result = new AHttpResult();
                 try {
-                    HttpClient client = new DefaultHttpClient();
+                    AbstractHttpClient client = new DefaultHttpClient();
+                    HttpParams httpParams = new BasicHttpParams();
+                    HttpConnectionParams.setConnectionTimeout(httpParams, 3 * 1000);
+                    HttpConnectionParams.setSoTimeout(httpParams, 3 * 1000);
+                    client.setParams(httpParams);
                     HttpResponse response = client.execute(request);
                     String content = readContent(response, charset);
 
@@ -69,17 +77,17 @@ public class AHttpClient {
 
             @Override
             protected void onProgressUpdate(Object... values) {
-                for (AHttpCallback callback : callbacks)
+                for (XHttpCallback callback : callbacks)
                     callback.onProgressUpdate(values);
             }
 
             @Override
             protected void onPostExecute(AHttpResult result) {
                 if (result.isSuccess) {
-                    for (AHttpCallback callback : callbacks)
+                    for (XHttpCallback callback : callbacks)
                         callback.onSuccess(result);
                 } else {
-                    for (AHttpCallback callback : callbacks)
+                    for (XHttpCallback callback : callbacks)
                         callback.onFaild(result);
                 }
             }

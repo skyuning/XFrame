@@ -2,7 +2,7 @@ package org.xframe.http;
 
 import org.apache.http.HttpResponse;
 
-abstract public interface AHttpCallback {
+abstract public interface XHttpCallback {
 
     public static class AHttpResult {
         public boolean isSuccess;

@@ -11,9 +11,9 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class AHttpCallbacks {
+public class XHttpCallbacks {
 
-    public static class DefaultHttpCallback implements AHttpCallback {
+    public static class DefaultHttpCallback implements XHttpCallback {
 
         @Override
         public void onPreExecute() {
@@ -32,7 +32,7 @@ public class AHttpCallbacks {
         }
     }
 
-    public static class DebugHttpCallback implements AHttpCallback {
+    public static class DebugHttpCallback implements XHttpCallback {
 
         protected static final int MESSAGE_CONTENT_LEN = 1;
         protected static final int MESSAGE_PROGRESS = 2;
