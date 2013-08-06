@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.xframe.http.XHttpRequest.AHttpMethod;
+import org.xframe.http.XHttpRequest.XHttpMethod;
 
 /*
  * Used to mark some attribute of HttpRequest
@@ -17,7 +17,7 @@ import org.xframe.http.XHttpRequest.AHttpMethod;
 @Documented
 @Inherited
 public @interface XHttpAttr {
-    public AHttpMethod method() default AHttpMethod.GET;
+    public XHttpMethod method() default XHttpMethod.GET;
 
     public String charset() default "utf-8";
 }

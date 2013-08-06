@@ -1,11 +1,10 @@
 package org.xframe.http;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -13,16 +12,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
-import android.text.TextUtils;
+import org.apache.http.util.EntityUtils;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 
 @XHttpAttr
 abstract public class XHttpRequest implements XHttpResponseHandler {
 
-    public static enum AHttpMethod {
+    public static enum XHttpMethod {
         GET, POST, DELETE
     }
 
-    private Map<String, String> mParamMap = new HashMap<String, String>();
+    private List<NameValuePair> mParams = new ArrayList<NameValuePair>();
+    private MultipartEntity mMultipartEntity;
     private XHttpAttr mAttr;
 
     public XHttpRequest() {
@@ -40,45 +45,40 @@ abstract public class XHttpRequest implements XHttpResponseHandler {
     }
 
     public void addParam(String key, String value) {
-        mParamMap.put(key, value.toString());
+        mParams.add(new BasicNameValuePair(key, value));
+    }
+    
+    private void addMultipart(String name, ContentBody contentBody) {
+        if (null == mMultipartEntity)
+            mMultipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+        mMultipartEntity.addPart(name, contentBody);
+    }
+    
+    public void addMultipartString(String name, String value) throws UnsupportedEncodingException {
+        addMultipart(name, new StringBody(value));
     }
 
-    public HttpUriRequest buildRequest() throws UnsupportedEncodingException {
+    public void addMultipartFile(String name, String path, String mineType) throws UnsupportedEncodingException {
+        addMultipart(name, new FileBody(new File(path), mineType));
+    }
+
+    public HttpUriRequest buildRequest() throws IOException {
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(mParams, "utf-8");
         switch (mAttr.method()) {
             case GET:
-                return buildGet();
+                HttpGet get = new HttpGet(buildUrl() + "?" + EntityUtils.toString(entity));
+                return get;
+                
             case POST:
-                return buildPost();
+                HttpPost post = new HttpPost(buildUrl());
+                if (null == mMultipartEntity)
+                    post.setEntity(new UrlEncodedFormEntity(mParams));
+                else
+                    post.setEntity(mMultipartEntity);
+                return post;
+                
             default:
                 return null;
         }
-    }
-
-    private HttpGet buildGet() {
-        List<String> keyValueList = new ArrayList<String>();
-        for (Object key : mParamMap.keySet()) {
-            String value = mParamMap.get(key);
-            try {
-                keyValueList.add(key + "=" + URLEncoder.encode(value, "utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        String paramString = TextUtils.join("&", keyValueList.toArray());
-
-        HttpGet get = new HttpGet(buildUrl() + "?" + paramString);
-        return get;
-    }
-
-    private HttpPost buildPost() throws UnsupportedEncodingException {
-        ArrayList<NameValuePair> postData = new ArrayList<NameValuePair>();
-        for (String key : mParamMap.keySet()) {
-            postData.add(new BasicNameValuePair(key, mParamMap.get(key)));
-        }
-
-        HttpPost post = new HttpPost(buildUrl());
-        post.setEntity(new UrlEncodedFormEntity(postData));
-
-        return post;
     }
 }

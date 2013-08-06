@@ -43,6 +43,8 @@ public class JSONUtils {
             Object fieldValue = jsonObject.opt(ann.name());
             try {
                 setJson2Field(javaObject, field, ann, fieldValue);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (InstantiationException e) {

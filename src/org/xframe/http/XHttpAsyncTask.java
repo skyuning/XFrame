@@ -14,13 +14,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.http.client.methods.HttpUriRequest;
 import org.xframe.http.XHttpCallback.AHttpResult;
 
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 
-public abstract class XHttpAsyncTask extends ImitatedAsyncTask<Void, Object, AHttpResult> {
+public abstract class XHttpAsyncTask extends ImitatedAsyncTask<HttpUriRequest, Object, AHttpResult> {
 }
 
 abstract class ImitatedAsyncTask<Params, Progress, Result> {

@@ -4,20 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 import org.xframe.http.XHttpCallback.AHttpResult;
@@ -28,7 +26,7 @@ public class XHttpClient {
 
         try {
             sendRequest(request.buildRequest(), request, request.getAttr().charset(), callbacks);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             AHttpResult result = new AHttpResult();
             result.isSuccess = false;
@@ -38,12 +36,12 @@ public class XHttpClient {
         }
     }
 
-    public static void sendRequest(final HttpUriRequest request,
+    public static void sendRequest(HttpUriRequest request,
             final XHttpResponseHandler responseHandler, final String charset,
             final XHttpCallback... callbacks) {
 
         XHttpAsyncTask reqTask = new XHttpAsyncTask() {
-
+            
             @Override
             protected void onPreExecute() {
                 for (XHttpCallback callback : callbacks)
@@ -51,15 +49,16 @@ public class XHttpClient {
             }
 
             @Override
-            protected AHttpResult doInBackground(Void... params) {
+            protected AHttpResult doInBackground(HttpUriRequest... params) {
                 AHttpResult result = new AHttpResult();
                 try {
                     AbstractHttpClient client = new DefaultHttpClient();
-                    HttpParams httpParams = new BasicHttpParams();
-                    HttpConnectionParams.setConnectionTimeout(httpParams, 3 * 1000);
-                    HttpConnectionParams.setSoTimeout(httpParams, 3 * 1000);
+                    HttpParams httpParams = client.getParams();
+                    HttpConnectionParams.setConnectionTimeout(httpParams, 10 * 1000);
+                    HttpConnectionParams.setSoTimeout(httpParams, 10 * 1000);
+                    HttpProtocolParams.setContentCharset(httpParams, "utf-8");
                     client.setParams(httpParams);
-                    HttpResponse response = client.execute(request);
+                    HttpResponse response = client.execute(params[0]);
                     String content = readContent(response, charset);
 
                     result.isSuccess = true;
@@ -93,7 +92,7 @@ public class XHttpClient {
             }
 
         };
-        reqTask.execute();
+        reqTask.execute(request);
     }
 
     private static String readContent(final HttpResponse response, final String defaultCharset)
