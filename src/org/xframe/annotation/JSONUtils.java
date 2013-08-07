@@ -24,7 +24,7 @@ public class JSONUtils {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @Inherited
-    public static @interface JSONDict{
+    public static @interface JSONDict {
         public String name();
 
         public String defVal() default "";
@@ -40,9 +40,9 @@ public class JSONUtils {
             if (null == ann || TextUtils.isEmpty(ann.name()))
                 continue;
 
-            Object fieldValue = jsonObject.opt(ann.name());
+            Object jsonValue = jsonObject.opt(ann.name());
             try {
-                setJson2Field(javaObject, field, ann, fieldValue);
+                setJson2Field(javaObject, field, ann, jsonValue);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -56,9 +56,9 @@ public class JSONUtils {
         return javaObject;
     }
 
-    private static void setJson2Field(Object object, Field field,
-            JSONDict ann, Object value) throws JSONException,
-            InstantiationException, IllegalAccessException {
+    private static void setJson2Field(Object object, Field field, JSONDict ann,
+            Object value) throws JSONException, InstantiationException,
+            IllegalAccessException {
 
         // check the value
         if (null == value) {
@@ -68,17 +68,22 @@ public class JSONUtils {
         }
 
         // process the value
-        if (value instanceof Double) // because java float and double value are confusing
+        if (value instanceof Double) // because java float and double value are
+                                     // confusing
             value = Float.valueOf(value.toString());
         else if (value instanceof JSONObject) {
-            value = json2JavaObject((JSONObject) value, field.getType().newInstance());
-        }
-        else if (value instanceof JSONArray) {
+            value = json2JavaObject((JSONObject) value, field.getType()
+                    .newInstance());
+        } else if (value instanceof JSONArray) {
             JSONArray jaValue = (JSONArray) value;
-            Class<?> elementType = ann.type();
-            for (int i=0; i<jaValue.length(); i++) {
-                json2JavaObject(jaValue.getJSONObject(i), elementType.newInstance());
+            Class<?> itemType = ann.type();
+            List<Object> list = new ArrayList<Object>();
+            for (int i = 0; i < jaValue.length(); i++) {
+                Object item = json2JavaObject(jaValue.getJSONObject(i),
+                        itemType.newInstance());
+                list.add(item);
             }
+            value = list;
         }
 
         // set the value to field

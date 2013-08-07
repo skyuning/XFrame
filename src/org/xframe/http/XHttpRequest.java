@@ -19,7 +19,6 @@ import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 
-@XHttpAttr
 abstract public class XHttpRequest implements XHttpResponseHandler {
 
     public static enum XHttpMethod {
@@ -33,7 +32,7 @@ abstract public class XHttpRequest implements XHttpResponseHandler {
     public XHttpRequest() {
         mAttr = this.getClass().getAnnotation(XHttpAttr.class);
     }
-
+    
     public XHttpAttr getAttr() {
         return mAttr;
     }
