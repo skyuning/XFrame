@@ -18,6 +18,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
+import org.xframe.BuildConfig;
 import org.xframe.http.XHttpCallback.AHttpResult;
 
 public class XHttpClient {
@@ -26,7 +27,7 @@ public class XHttpClient {
 
         try {
             sendRequest(request.buildRequest(), request, request.getAttr().charset(), callbacks);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             AHttpResult result = new AHttpResult();
             result.isSuccess = false;
@@ -60,6 +61,9 @@ public class XHttpClient {
                     client.setParams(httpParams);
                     HttpResponse response = client.execute(params[0]);
                     String content = readContent(response, charset);
+                    
+                    if (BuildConfig.DEBUG)
+                        System.err.println(content);
 
                     result.isSuccess = true;
                     result.response = response;

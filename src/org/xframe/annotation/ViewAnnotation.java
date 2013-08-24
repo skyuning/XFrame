@@ -10,8 +10,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 public class ViewAnnotation {
     
@@ -54,7 +57,7 @@ public class ViewAnnotation {
             field.set(viewHolder, v);
 
             String clickListener = ann.clickListener();
-            if (!clickListener.equals("")) {
+            if (! clickListener.equals("")) {
                 final Method method = clazz.getDeclaredMethod(clickListener, (Class<?>[]) null);
                 method.setAccessible(true);
                 v.setOnClickListener(new OnClickListener() {
@@ -69,6 +72,25 @@ public class ViewAnnotation {
                         } catch (InvocationTargetException e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+            }
+            
+            if (v instanceof TextView) {
+                final TextView tv = (TextView) v;
+                tv.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().equals("null"))
+                            tv.setText("");
+                    }
+                    
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+                    
+                    @Override
+                    public void afterTextChanged(Editable s) {
                     }
                 });
             }

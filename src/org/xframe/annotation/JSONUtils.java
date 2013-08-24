@@ -31,6 +31,27 @@ public class JSONUtils {
 
         public Class<?> type() default void.class;
     }
+    
+    public static JSONObject java2JsonObject(Object javaObject, JSONObject jsonObject) {
+        Class<?> clazz = javaObject.getClass();
+        List<Field> fields = recursiveGetFields(clazz, false);
+        for (Field field : fields) {
+            JSONDict ann = field.getAnnotation(JSONDict.class);
+            if (null == ann || TextUtils.isEmpty(ann.name()))
+                continue;
+
+            try {
+                jsonObject.put(ann.name(), field.get(javaObject));
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonObject;
+    }
 
     public static <T> T json2JavaObject(JSONObject jsonObject, T javaObject) {
         Class<?> clazz = javaObject.getClass();

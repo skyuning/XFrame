@@ -2,7 +2,9 @@ package org.xframe.http;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Iterator;
 
+import org.json.JSONObject;
 import org.xframe.R;
 
 import android.app.AlertDialog;
@@ -81,7 +83,16 @@ public class XHttpCallbacks {
                 mimeType = "text/plain";
 
             mTitleTv.setText("Success");
-            mWebView.loadDataWithBaseURL(null, result.content, mimeType, "utf-8", null);
+            String text = "";
+            if (result.data instanceof JSONObject) {
+                JSONObject jo = (JSONObject) result.data;
+                Iterator<?> iter = jo.keys();
+                while (iter.hasNext()) {
+                    String key = (String) iter.next();
+                    text += key + ": " + jo.optString(key) + "\n";
+                }
+            }
+            mWebView.loadDataWithBaseURL(null, text, mimeType, "utf-8", null);
         }
 
         public void onFaild(AHttpResult result) {

@@ -25,9 +25,9 @@ abstract public class XHttpRequest implements XHttpResponseHandler {
         GET, POST, DELETE
     }
 
-    private List<NameValuePair> mParams = new ArrayList<NameValuePair>();
-    private MultipartEntity mMultipartEntity;
-    private XHttpAttr mAttr;
+    protected List<NameValuePair> mParams = new ArrayList<NameValuePair>();
+    protected MultipartEntity mMultipartEntity;
+    protected XHttpAttr mAttr;
 
     public XHttpRequest() {
         mAttr = this.getClass().getAnnotation(XHttpAttr.class);
@@ -59,6 +59,10 @@ abstract public class XHttpRequest implements XHttpResponseHandler {
 
     public void addMultipartFile(String name, String path, String mineType) throws UnsupportedEncodingException {
         addMultipart(name, new FileBody(new File(path), mineType));
+    }
+    
+    public void addMultipartImage(String name, String path) throws UnsupportedEncodingException {
+        addMultipartFile(name, path, "image/jpeg");
     }
 
     public HttpUriRequest buildRequest() throws IOException {
