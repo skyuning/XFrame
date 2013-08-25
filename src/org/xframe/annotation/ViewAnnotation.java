@@ -9,6 +9,9 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,7 +49,7 @@ public class ViewAnnotation {
 
         Class<?> clazz = viewHolder.getClass();
 
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = recursiveGetFields(clazz, false).toArray(new Field[0]);
         for (Field field : fields) {
             ViewInject ann = field.getAnnotation(ViewInject.class);
             if (ann == null)
@@ -95,5 +98,18 @@ public class ViewAnnotation {
                 });
             }
         }
+    }
+
+    private static List<Field> recursiveGetFields(Class<?> clazz, boolean includeStatic) {
+        List<Field> fields = new ArrayList<Field>();
+        for (Field field : clazz.getDeclaredFields()) {
+            if (includeStatic || ! Modifier.isStatic(field.getModifiers()))
+                fields.add(field);
+        }
+        if ((clazz != Object.class) && (clazz.getSuperclass() != null)) {
+            fields.addAll(recursiveGetFields(clazz.getSuperclass(),
+                    includeStatic));
+        }
+        return fields;
     }
 }

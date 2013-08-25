@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -64,18 +65,22 @@ abstract public class XHttpRequest implements XHttpResponseHandler {
     public void addMultipartImage(String name, String path) throws UnsupportedEncodingException {
         addMultipartFile(name, path, "image/jpeg");
     }
+    
+    protected String buildQueryString() throws ParseException, IOException {
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(mParams, "utf-8");
+        return EntityUtils.toString(entity);
+    }
 
     public HttpUriRequest buildRequest() throws IOException {
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(mParams, "utf-8");
         switch (mAttr.method()) {
             case GET:
-                HttpGet get = new HttpGet(buildUrl() + "?" + EntityUtils.toString(entity));
+                HttpGet get = new HttpGet(buildUrl() + "?" + buildQueryString());
                 return get;
                 
             case POST:
                 HttpPost post = new HttpPost(buildUrl());
                 if (null == mMultipartEntity)
-                    post.setEntity(new UrlEncodedFormEntity(mParams));
+                    post.setEntity(new UrlEncodedFormEntity(mParams, "utf-8"));
                 else
                     post.setEntity(mMultipartEntity);
                 return post;

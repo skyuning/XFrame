@@ -83,7 +83,10 @@ public class JSONUtils {
 
         // check the value
         if (null == value) {
-            value = new JSONTokener(ann.defVal()).nextValue();
+            String defVal = ann.defVal();
+            if (TextUtils.isEmpty(defVal))
+                return;
+            value = new JSONTokener(defVal).nextValue();
             if (JSONObject.NULL == value)
                 return;
         }

@@ -62,8 +62,10 @@ public class XHttpClient {
                     HttpResponse response = client.execute(params[0]);
                     String content = readContent(response, charset);
                     
-                    if (BuildConfig.DEBUG)
+                    if (BuildConfig.DEBUG) {
+                        System.err.println(params[0].getURI().toString());
                         System.err.println(content);
+                    }
 
                     result.isSuccess = true;
                     result.response = response;
