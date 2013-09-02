@@ -102,7 +102,8 @@ public class XHttpCallbacks {
             String stackTrace = sw.toString();
 
             mTitleTv.setText("Faild");
-            mWebView.loadDataWithBaseURL(null, stackTrace, "text/plain", "utf-8", null);
+            mWebView.loadDataWithBaseURL(null, result.content + "\n\n" + stackTrace,
+                    "text/plain", "utf-8", null);
         }
     }
 }

@@ -28,8 +28,8 @@ abstract class ImitatedAsyncTask<Params, Progress, Result> {
 
     private static final String LOG_TAG = "AsyncTask";
 
-    private static final int CORE_POOL_SIZE = 1;
-    private static final int MAXIMUM_POOL_SIZE = 1;
+    private static final int CORE_POOL_SIZE = 5;
+    private static final int MAXIMUM_POOL_SIZE = 128;
     private static final int KEEP_ALIVE = 60;
 
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {

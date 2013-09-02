@@ -64,7 +64,7 @@ public class XHttpClient {
                     
                     if (BuildConfig.DEBUG) {
                         System.err.println(params[0].getURI().toString());
-                        System.err.println(content);
+                        System.err.println("content: " + content);
                     }
 
                     result.isSuccess = true;
